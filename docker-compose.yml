@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: agromanage-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agromanage
+      POSTGRES_PASSWORD: agromanage
+      POSTGRES_DB: agromanage
+    ports:
+      - "5432:5432"
+    volumes:
+      - agromanage_pgdata:/var/lib/postgresql/data
+
+volumes:
+  agromanage_pgdata:
