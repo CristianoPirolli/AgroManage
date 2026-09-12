@@ -1,0 +1,150 @@
+// Schema do AgroManage — aplicação para gerenciamento de propriedades rurais.
+// Saiba mais em: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "esm"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CropStatus {
+  PLANNED
+  PLANTED
+  GROWING
+  HARVESTED
+
+  @@map("crop_status")
+}
+
+enum ExpenseCategory {
+  INSUMOS
+  COMBUSTIVEL
+  MANUTENCAO
+  MAO_DE_OBRA
+  MAQUINARIO
+  OUTROS
+
+  @@map("expense_category")
+}
+
+model User {
+  id           String     @id(map: "user_pkey") @default(cuid())
+  name         String
+  email        String     @unique(map: "user_email_key")
+  passwordHash String     @map("password_hash")
+  properties   Property[]
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  @@map("user")
+}
+
+model Property {
+  id          Int          @id(map: "property_pkey") @default(autoincrement())
+  name        String
+  location    String?
+  city        String
+  state       String
+  totalArea   Float        @map("total_area")
+  userId      String       @map("user_id")
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade, map: "property_user_id_fkey")
+  crops       Crop[]
+  activities  Activity[]
+  stockItems  StockItem[]
+  expenses    Expense[]
+  productions Production[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@index([userId], map: "property_user_id_idx")
+  @@map("property")
+}
+
+model Crop {
+  id                  Int          @id(map: "crop_pkey") @default(autoincrement())
+  name                String
+  plantedArea         Float        @map("planted_area")
+  plantingDate         DateTime     @map("planting_date")
+  expectedHarvestDate DateTime?    @map("expected_harvest_date")
+  status              CropStatus   @default(PLANNED)
+  propertyId          Int          @map("property_id")
+  property            Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade, map: "crop_property_id_fkey")
+  activities          Activity[]
+  productions         Production[]
+  createdAt           DateTime     @default(now()) @map("created_at")
+  updatedAt           DateTime     @updatedAt @map("updated_at")
+
+  @@index([propertyId], map: "crop_property_id_idx")
+  @@map("crop")
+}
+
+model Activity {
+  id          Int       @id(map: "activity_pkey") @default(autoincrement())
+  title       String
+  description String?
+  date        DateTime
+  cost        Float?
+  category    String
+  propertyId  Int       @map("property_id")
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade, map: "activity_property_id_fkey")
+  cropId      Int?      @map("crop_id")
+  crop        Crop?     @relation(fields: [cropId], references: [id], onDelete: SetNull, map: "activity_crop_id_fkey")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([propertyId], map: "activity_property_id_idx")
+  @@index([cropId], map: "activity_crop_id_idx")
+  @@map("activity")
+}
+
+model StockItem {
+  id              Int      @id(map: "stock_item_pkey") @default(autoincrement())
+  name            String
+  category        String
+  quantity        Float
+  unit            String
+  minimumQuantity Float    @map("minimum_quantity")
+  propertyId      Int      @map("property_id")
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade, map: "stock_item_property_id_fkey")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([propertyId], map: "stock_item_property_id_idx")
+  @@map("stock_item")
+}
+
+model Expense {
+  id          Int             @id(map: "expense_pkey") @default(autoincrement())
+  description String
+  amount      Float
+  category    ExpenseCategory
+  date        DateTime
+  propertyId  Int             @map("property_id")
+  property    Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade, map: "expense_property_id_fkey")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@index([propertyId], map: "expense_property_id_idx")
+  @@map("expense")
+}
+
+model Production {
+  id          Int      @id(map: "production_pkey") @default(autoincrement())
+  quantity    Float
+  unit        String
+  harvestDate DateTime @map("harvest_date")
+  notes       String?
+  cropId      Int      @map("crop_id")
+  crop        Crop     @relation(fields: [cropId], references: [id], onDelete: Cascade, map: "production_crop_id_fkey")
+  propertyId  Int      @map("property_id")
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade, map: "production_property_id_fkey")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([cropId], map: "production_crop_id_idx")
+  @@index([propertyId], map: "production_property_id_idx")
+  @@map("production")
+}

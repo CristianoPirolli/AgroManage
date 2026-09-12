@@ -8,7 +8,8 @@ services:
       POSTGRES_PASSWORD: agromanage
       POSTGRES_DB: agromanage
     ports:
-      - "127.0.0.1:5432:5432"
+      # Porta 5433 no host: a 5432 já está em uso pelo PostgreSQL local da máquina.
+      - "127.0.0.1:5433:5432"
     volumes:
       - agromanage_pgdata:/var/lib/postgresql/data
 

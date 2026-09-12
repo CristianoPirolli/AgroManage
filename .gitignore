@@ -7,6 +7,7 @@ dist/
 out/
 coverage/
 *.tsbuildinfo
+backend/src/generated/
 
 # Local environment files
 .env
