@@ -191,7 +191,8 @@ Os próximos passos estão registrados como [Issues](../../issues) neste reposit
 
 ## Deploy
 
-_Pendente — será preenchido após o deploy do frontend (Vercel) e do backend (Render/Railway)._
+- Frontend: [https://frontend-beta-six-acqj50dno4.vercel.app](https://frontend-beta-six-acqj50dno4.vercel.app) (Vercel)
+- Backend: _pendente — será publicado no Render ou Railway junto com um PostgreSQL na nuvem, quando as APIs estiverem integradas ao frontend._
 
 ## Vídeo de apresentação
 
