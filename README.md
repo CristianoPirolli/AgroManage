@@ -149,6 +149,25 @@ npx prisma migrate dev
 
 Em produção, use `npx prisma migrate deploy` em vez de `migrate dev`.
 
+### Banco na nuvem (produção)
+
+Para produção, o PostgreSQL fica hospedado no [Neon](https://neon.tech), provisionado pelo Vercel Marketplace e conectado ao projeto `backend` na Vercel:
+
+```bash
+cd backend
+npx vercel link          # se ainda não estiver linkado
+npx vercel integration add neon --no-claim
+npx vercel env pull .env.local --yes
+```
+
+Isso cria `backend/.env.local` (ignorado pelo Git) com `DATABASE_URL` (pooled) e `DATABASE_URL_UNPOOLED` do Neon. Para aplicar as migrations nesse banco, use a URL sem pooling:
+
+```bash
+DATABASE_URL=$DATABASE_URL_UNPOOLED npx prisma migrate deploy
+```
+
+Ao publicar o backend (Render/Railway), configure lá as mesmas variáveis do `.env.local`.
+
 ## Executando
 
 Terminal do backend:
