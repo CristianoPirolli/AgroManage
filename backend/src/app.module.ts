@@ -9,6 +9,7 @@ import { HealthController } from './health.controller.js';
 import { AuthModule } from './auth/auth.module.js';
 import { PropertiesModule } from './properties/properties.module.js';
 import { CropsModule } from './crops/crops.module.js';
+import { ActivitiesModule } from './activities/activities.module.js';
 import { env } from './config/env.js';
 
 @Module({
@@ -23,6 +24,7 @@ import { env } from './config/env.js';
     AuthModule,
     PropertiesModule,
     CropsModule,
+    ActivitiesModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

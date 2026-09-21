@@ -3,6 +3,12 @@
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 
+const NAV_LINKS = [
+  { href: '/propriedades', label: 'Propriedades' },
+  { href: '/culturas', label: 'Culturas' },
+  { href: '/atividades', label: 'Atividades' },
+];
+
 export default function Home() {
   const { user, loading, logout } = useAuth();
 
@@ -26,19 +32,16 @@ export default function Home() {
           <p className="text-zinc-700 dark:text-zinc-300">
             Bem-vindo, <strong>{user.name}</strong>.
           </p>
-          <div className="flex gap-3">
-            <Link
-              href="/propriedades"
-              className="rounded-md bg-emerald-700 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-800"
-            >
-              Propriedades
-            </Link>
-            <Link
-              href="/culturas"
-              className="rounded-md border border-emerald-700 px-5 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-950"
-            >
-              Culturas
-            </Link>
+          <div className="flex flex-wrap justify-center gap-3">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="rounded-md border border-emerald-700 px-5 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:hover:bg-emerald-950"
+              >
+                {link.label}
+              </Link>
+            ))}
             <button
               onClick={logout}
               className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
