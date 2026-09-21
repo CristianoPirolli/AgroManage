@@ -8,6 +8,10 @@ import { LoginDto } from './dto/login.dto.js';
 import type { AuthenticatedUser } from './auth.types.js';
 
 const BCRYPT_COST = 12;
+// Hash de um valor fixo, usado só pra manter o tempo de resposta do login
+// constante quando o e-mail não existe (evita descobrir e-mails cadastrados
+// pelo tempo de resposta, já que bcrypt.compare só roda quando o usuário existe).
+const DUMMY_PASSWORD_HASH = '$2b$12$owIAXvn8IK3SgYqcChSkRe0VGGht.y/P2txHVsnJH7ybG3UTb5gSe';
 
 @Injectable()
 export class AuthService {
@@ -35,7 +39,9 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.prisma.user.findUnique({ where: { email: dto.email } });
-    if (!user || !(await compare(dto.password, user.passwordHash))) {
+    const isValidPassword = await compare(dto.password, user?.passwordHash ?? DUMMY_PASSWORD_HASH);
+
+    if (!user || !isValidPassword) {
       throw new UnauthorizedException('E-mail ou senha inválidos');
     }
 
