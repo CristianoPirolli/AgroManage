@@ -20,7 +20,7 @@ export function useAuth(options?: { redirectToLogin?: boolean }) {
       return;
     }
 
-    me(token)
+    me()
       .then(setUser)
       .catch(() => {
         clearToken();
