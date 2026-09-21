@@ -10,7 +10,13 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!response.ok) {
-    throw new Error(`Erro ${response.status} ao acessar ${path}`);
+    const body = await response.json().catch(() => null);
+    const message = body?.message ?? `Erro ${response.status} ao acessar ${path}`;
+    throw new Error(Array.isArray(message) ? message.join(', ') : message);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   return response.json() as Promise<T>;
