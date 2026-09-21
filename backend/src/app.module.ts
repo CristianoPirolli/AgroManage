@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { PropertiesModule } from './properties/properties.module.js';
 import { CropsModule } from './crops/crops.module.js';
 import { ActivitiesModule } from './activities/activities.module.js';
+import { StockItemsModule } from './stock-items/stock-items.module.js';
 import { env } from './config/env.js';
 
 @Module({
@@ -25,6 +26,7 @@ import { env } from './config/env.js';
     PropertiesModule,
     CropsModule,
     ActivitiesModule,
+    StockItemsModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

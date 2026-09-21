@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: '/propriedades', label: 'Propriedades' },
   { href: '/culturas', label: 'Culturas' },
   { href: '/atividades', label: 'Atividades' },
+  { href: '/estoque', label: 'Estoque' },
 ];
 
 export default function Home() {
