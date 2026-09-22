@@ -7,18 +7,19 @@ Aplicação web para gerenciamento de propriedades rurais: centraliza culturas, 
 
 ## Status
 
-Este repositório está na etapa de **kickoff estrutural**: repositório, backend e frontend configurados, banco de dados com a migration inicial aplicada. As funcionalidades (CRUDs, dashboard, autenticação) ainda **não estão integradas** — isso está planejado nas [Issues](../../issues) do repositório e será implementado em etapas.
+MVP funcional, com todas as prioridades 1 e 2 do escopo implementadas e integradas de ponta a ponta (frontend → backend → Prisma → PostgreSQL), publicado em produção. Falta apenas Produção/gráficos/relatórios (prioridade 3, extras). Acompanhamento nas [Issues](../../issues).
 
-## Funcionalidades planejadas
+## Funcionalidades
 
-- Gerenciar propriedades rurais.
-- Cadastrar culturas agrícolas.
-- Registrar atividades realizadas nas propriedades.
-- Controlar itens de estoque e insumos, com alerta de quantidade baixa.
-- Registrar despesas da propriedade.
-- Registrar informações básicas de produção/colheita.
-- Dashboard com dados reais (propriedades, culturas ativas, despesas do mês, atividades recentes, estoque baixo).
-- Autenticação de usuários com JWT e proteção de rotas.
+- Cadastro e login de usuários com JWT (senha com hash bcrypt).
+- CRUD de propriedades rurais.
+- CRUD de culturas agrícolas, vinculadas a uma propriedade.
+- CRUD de atividades agrícolas, vinculadas a uma propriedade e, opcionalmente, a uma cultura da mesma propriedade.
+- CRUD de itens de estoque, com alerta visual quando a quantidade fica igual ou abaixo do mínimo.
+- CRUD de despesas por categoria, com total gasto exibido na tela.
+- Dashboard com dados reais: propriedades, culturas ativas, despesas do mês, atividades registradas, alertas de estoque baixo, últimas atividades e despesas.
+- Todos os dados são isolados por usuário — cada conta só acessa suas próprias propriedades e registros.
+- Rate limit simples contra brute-force em `/auth/register` e `/auth/login`.
 
 ## Tecnologias utilizadas
 
@@ -72,17 +73,25 @@ O schema completo, com todos os campos e relacionamentos, está em [`backend/pri
 agromanage/
 ├── docker-compose.yml     # Postgres para desenvolvimento local
 ├── backend/
+│   ├── api/index.ts       # entrada serverless (deploy na Vercel)
 │   ├── prisma/            # schema.prisma e migrations
 │   └── src/
 │       ├── config/        # validação das variáveis de ambiente
 │       ├── database/      # PrismaService / DatabaseModule
+│       ├── common/        # rate limit e utilitários compartilhados
+│       ├── auth/          # cadastro, login, JWT, guard
+│       ├── properties/    # CRUD de propriedades
+│       ├── crops/         # CRUD de culturas
+│       ├── activities/    # CRUD de atividades
+│       ├── stock-items/   # CRUD de estoque
+│       ├── expenses/      # CRUD de despesas
 │       └── health.controller.ts
 └── frontend/
-    ├── app/                # rotas (App Router)
-    ├── components/
-    ├── services/           # comunicação com a API
+    ├── app/                # rotas (App Router): login, cadastro, dashboard, propriedades, culturas, atividades, estoque, despesas
+    ├── components/         # modais de formulário (um por entidade)
+    ├── services/           # comunicação com a API (um arquivo por entidade)
     ├── types/
-    ├── hooks/
+    ├── hooks/              # useAuth
     └── lib/
 ```
 
@@ -151,7 +160,7 @@ Em produção, use `npx prisma migrate deploy` em vez de `migrate dev`.
 
 ### Banco na nuvem (produção)
 
-Para produção, o PostgreSQL fica hospedado no [Neon](https://neon.tech), provisionado pelo Vercel Marketplace e conectado ao projeto `backend` na Vercel:
+Em produção, o PostgreSQL fica hospedado no [Neon](https://neon.tech), provisionado pelo Vercel Marketplace e conectado ao projeto `backend` na Vercel:
 
 ```bash
 cd backend
@@ -165,8 +174,6 @@ Isso cria `backend/.env.local` (ignorado pelo Git) com `DATABASE_URL` (pooled) e
 ```bash
 DATABASE_URL=$DATABASE_URL_UNPOOLED npx prisma migrate deploy
 ```
-
-Ao publicar o backend (Render/Railway), configure lá as mesmas variáveis do `.env.local`.
 
 ## Executando
 
@@ -202,16 +209,19 @@ Com o backend rodando, `GET http://localhost:3333/health` deve responder `{"stat
 
 ## Roadmap
 
-1. **Prioridade 1** — CRUD de propriedades, culturas, atividades, estoque e despesas, com frontend integrado.
-2. **Prioridade 2** — Dashboard com dados reais, autenticação JWT, proteção de rotas, alertas de estoque baixo.
-3. **Prioridade 3** — Produção, gráficos, upload de imagens, relatórios.
+1. ✅ **Prioridade 1** — CRUD de propriedades, culturas, atividades, estoque e despesas, com frontend integrado.
+2. ✅ **Prioridade 2** — Dashboard com dados reais, autenticação JWT, proteção de rotas, alertas de estoque baixo.
+3. ⬜ **Prioridade 3** — Produção, gráficos, upload de imagens, relatórios (extras).
 
 Os próximos passos estão registrados como [Issues](../../issues) neste repositório.
 
 ## Deploy
 
 - Frontend: [https://frontend-beta-six-acqj50dno4.vercel.app](https://frontend-beta-six-acqj50dno4.vercel.app) (Vercel)
-- Backend: _pendente — será publicado no Render ou Railway junto com um PostgreSQL na nuvem, quando as APIs estiverem integradas ao frontend._
+- Backend (API): [https://backend-phi-nine-31.vercel.app](https://backend-phi-nine-31.vercel.app) (Vercel, função serverless) — health check em `/health`
+- Banco: PostgreSQL gerenciado pelo [Neon](https://neon.tech)
+
+> O backend roda como função serverless na Vercel (`backend/api/index.ts` + `backend/vercel.json`), no mesmo padrão do NestJS empacotado com `@vercel/node`, em vez de Render/Railway.
 
 ## Vídeo de apresentação
 
