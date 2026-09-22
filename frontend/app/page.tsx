@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 
 const NAV_LINKS = [
+  { href: '/dashboard', label: 'Dashboard' },
   { href: '/propriedades', label: 'Propriedades' },
   { href: '/culturas', label: 'Culturas' },
   { href: '/atividades', label: 'Atividades' },
