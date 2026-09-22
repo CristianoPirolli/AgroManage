@@ -11,6 +11,7 @@ import { PropertiesModule } from './properties/properties.module.js';
 import { CropsModule } from './crops/crops.module.js';
 import { ActivitiesModule } from './activities/activities.module.js';
 import { StockItemsModule } from './stock-items/stock-items.module.js';
+import { ExpensesModule } from './expenses/expenses.module.js';
 import { env } from './config/env.js';
 
 @Module({
@@ -27,6 +28,7 @@ import { env } from './config/env.js';
     CropsModule,
     ActivitiesModule,
     StockItemsModule,
+    ExpensesModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

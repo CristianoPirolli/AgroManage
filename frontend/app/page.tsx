@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: '/culturas', label: 'Culturas' },
   { href: '/atividades', label: 'Atividades' },
   { href: '/estoque', label: 'Estoque' },
+  { href: '/despesas', label: 'Despesas' },
 ];
 
 export default function Home() {
