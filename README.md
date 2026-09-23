@@ -217,11 +217,11 @@ Os próximos passos estão registrados como [Issues](../../issues) neste reposit
 
 ## Deploy
 
-- Frontend: [https://frontend-beta-six-acqj50dno4.vercel.app](https://frontend-beta-six-acqj50dno4.vercel.app) (Vercel)
+- Frontend: [https://agro-manage-nine.vercel.app](https://agro-manage-nine.vercel.app) (Vercel)
 - Backend (API): [https://backend-phi-nine-31.vercel.app](https://backend-phi-nine-31.vercel.app) (Vercel, função serverless) — health check em `/health`
 - Banco: PostgreSQL gerenciado pelo [Neon](https://neon.tech)
 
-> O backend roda como função serverless na Vercel (`backend/api/index.ts` + `backend/vercel.json`), no mesmo padrão do NestJS empacotado com `@vercel/node`, em vez de Render/Railway.
+> O backend roda como função serverless na Vercel (`backend/api/index.ts` + `backend/vercel.json`), no mesmo padrão do NestJS empacotado com `@vercel/node`, em vez de Render/Railway. O CORS do backend libera mais de uma origem (`CORS_ORIGIN` aceita lista separada por vírgula) porque a integração do GitHub com a Vercel criou automaticamente um segundo projeto de frontend (`agro-manage`) além do que eu havia criado manualmente (`frontend`) — os dois apontam pro mesmo repositório e ficam publicados; use o link `agro-manage-nine.vercel.app` acima como oficial.
 
 ## Vídeo de apresentação
 
