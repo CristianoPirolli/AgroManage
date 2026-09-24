@@ -20,6 +20,7 @@ MVP funcional, com todas as prioridades 1 e 2 do escopo implementadas e integrad
 - Dashboard com dados reais: propriedades, culturas ativas, despesas do mês, atividades registradas, alertas de estoque baixo, últimas atividades e despesas.
 - Todos os dados são isolados por usuário — cada conta só acessa suas próprias propriedades e registros.
 - Rate limit simples contra brute-force em `/auth/register` e `/auth/login`.
+- Interface responsiva (celular e desktop) com menu lateral, modo claro/escuro automático, diálogo de confirmação para exclusões e orientação para contas novas.
 
 ## Tecnologias utilizadas
 
@@ -87,8 +88,8 @@ agromanage/
 │       ├── expenses/      # CRUD de despesas
 │       └── health.controller.ts
 └── frontend/
-    ├── app/                # rotas (App Router): login, cadastro, dashboard, propriedades, culturas, atividades, estoque, despesas
-    ├── components/         # modais de formulário (um por entidade)
+    ├── app/                # rotas (App Router): página inicial, login, cadastro e, em (app)/, as telas internas (dashboard, propriedades, culturas, atividades, estoque, despesas)
+    ├── components/         # menu lateral (AppShell), modais de formulário (um por entidade) e ui/ (componentes base)
     ├── services/           # comunicação com a API (um arquivo por entidade)
     ├── types/
     ├── hooks/              # useAuth

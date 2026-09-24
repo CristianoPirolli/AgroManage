@@ -1,6 +1,9 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
+import { Modal } from '@/components/ui/Modal';
+import { ErrorAlert } from '@/components/ui/Feedback';
+import { Field, FormActions } from '@/components/ui/Form';
 import type { Expense, ExpenseCategory, ExpenseInput } from '@/types/expense';
 import { EXPENSE_CATEGORY_LABELS } from '@/types/expense';
 import type { Property } from '@/types/property';
@@ -13,47 +16,39 @@ type ExpenseFormModalProps = {
   onSubmit: (data: ExpenseInput) => Promise<void>;
 };
 
-function emptyForm(properties: Property[]): ExpenseInput {
+function toForm(expense: Expense | null, properties: Property[]): ExpenseInput {
+  if (!expense) {
+    return {
+      description: '',
+      amount: 0,
+      category: 'INSUMOS',
+      date: '',
+      propertyId: properties[0]?.id ?? 0,
+    };
+  }
   return {
-    description: '',
-    amount: 0,
-    category: 'INSUMOS',
-    date: '',
-    propertyId: properties[0]?.id ?? 0,
+    description: expense.description,
+    amount: expense.amount,
+    category: expense.category,
+    date: expense.date.slice(0, 10),
+    propertyId: expense.propertyId,
   };
 }
 
 export function ExpenseFormModal({ open, expense, properties, onClose, onSubmit }: ExpenseFormModalProps) {
-  const [form, setForm] = useState<ExpenseInput>(() => emptyForm(properties));
+  return (
+    <Modal open={open} title={expense ? 'Editar despesa' : 'Nova despesa'} onClose={onClose}>
+      <ExpenseForm expense={expense} properties={properties} onClose={onClose} onSubmit={onSubmit} />
+    </Modal>
+  );
+}
+
+type ExpenseFormProps = Omit<ExpenseFormModalProps, 'open'>;
+
+function ExpenseForm({ expense, properties, onClose, onSubmit }: ExpenseFormProps) {
+  const [form, setForm] = useState<ExpenseInput>(() => toForm(expense, properties));
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    setError(null);
-    setForm(
-      expense
-        ? {
-            description: expense.description,
-            amount: expense.amount,
-            category: expense.category,
-            date: expense.date.slice(0, 10),
-            propertyId: expense.propertyId,
-          }
-        : emptyForm(properties),
-    );
-  }, [open, expense, properties]);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose();
-    }
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, onClose]);
-
-  if (!open) return null;
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -73,138 +68,80 @@ export function ExpenseFormModal({ open, expense, properties, onClose, onSubmit 
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg dark:bg-zinc-950"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            {expense ? 'Editar despesa' : 'Nova despesa'}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Fechar"
-            className="text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      <Field label="Propriedade" htmlFor="propertyId">
+        <select
+          id="propertyId"
+          required
+          disabled={!!expense}
+          value={form.propertyId}
+          onChange={(e) => setForm((f) => ({ ...f, propertyId: Number(e.target.value) }))}
+          className="input"
+        >
+          {properties.map((property) => (
+            <option key={property.id} value={property.id}>
+              {property.name}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field label="Descrição" htmlFor="description">
+        <input
+          id="description"
+          required
+          minLength={2}
+          maxLength={200}
+          value={form.description}
+          onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+          className="input"
+        />
+      </Field>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Valor (R$)" htmlFor="amount">
+          <input
+            id="amount"
+            type="number"
+            required
+            min={0.01}
+            step="0.01"
+            placeholder="0,00"
+            value={form.amount || ''}
+            onChange={(e) => setForm((f) => ({ ...f, amount: Number(e.target.value) }))}
+            className="input"
+          />
+        </Field>
+
+        <Field label="Categoria" htmlFor="category">
+          <select
+            id="category"
+            value={form.category}
+            onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as ExpenseCategory }))}
+            className="input"
           >
-            ✕
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
-            <label htmlFor="propertyId" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Propriedade
-            </label>
-            <select
-              id="propertyId"
-              required
-              disabled={!!expense}
-              value={form.propertyId}
-              onChange={(e) => setForm((f) => ({ ...f, propertyId: Number(e.target.value) }))}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 disabled:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:disabled:bg-zinc-800"
-            >
-              {properties.map((property) => (
-                <option key={property.id} value={property.id}>
-                  {property.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor="description" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Descrição
-            </label>
-            <input
-              id="description"
-              required
-              minLength={2}
-              maxLength={200}
-              value={form.description}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 dark:border-zinc-700 dark:bg-zinc-900"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1">
-              <label htmlFor="amount" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Valor (R$)
-              </label>
-              <input
-                id="amount"
-                type="number"
-                required
-                min={0.01}
-                step="0.01"
-                value={form.amount}
-                onChange={(e) => setForm((f) => ({ ...f, amount: Number(e.target.value) }))}
-                className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 dark:border-zinc-700 dark:bg-zinc-900"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label htmlFor="category" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Categoria
-              </label>
-              <select
-                id="category"
-                value={form.category}
-                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as ExpenseCategory }))}
-                className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 dark:border-zinc-700 dark:bg-zinc-900"
-              >
-                {Object.entries(EXPENSE_CATEGORY_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor="date" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Data
-            </label>
-            <input
-              id="date"
-              type="date"
-              required
-              value={form.date}
-              onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600 dark:border-zinc-700 dark:bg-zinc-900"
-            />
-          </div>
-
-          {error && (
-            <p role="alert" className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-              {error}
-            </p>
-          )}
-
-          <div className="mt-2 flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-900"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={submitting || properties.length === 0}
-              className="rounded-md bg-emerald-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-800 disabled:opacity-60"
-            >
-              {submitting ? 'Salvando…' : 'Salvar'}
-            </button>
-          </div>
-        </form>
+            {Object.entries(EXPENSE_CATEGORY_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </Field>
       </div>
-    </div>
+
+      <Field label="Data" htmlFor="date">
+        <input
+          id="date"
+          type="date"
+          required
+          value={form.date}
+          onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
+          className="input"
+        />
+      </Field>
+
+      {error && <ErrorAlert message={error} />}
+      <FormActions onCancel={onClose} submitting={submitting} disabled={properties.length === 0} />
+    </form>
   );
 }

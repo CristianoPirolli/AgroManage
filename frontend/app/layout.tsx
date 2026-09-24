@@ -1,29 +1,36 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Instrument_Sans } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const instrument = Instrument_Sans({
+  variable: "--font-instrument",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "AgroManage",
+  title: {
+    default: "AgroManage",
+    template: "%s | AgroManage",
+  },
   description: "Gerenciamento de propriedades rurais: culturas, atividades, estoque e despesas.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#17392b",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="pt-BR"
+      className={`${bricolage.variable} ${instrument.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
