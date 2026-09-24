@@ -221,7 +221,7 @@ Os próximos passos estão registrados como [Issues](../../issues) neste reposit
 - Backend (API): [https://backend-phi-nine-31.vercel.app](https://backend-phi-nine-31.vercel.app) (Vercel, função serverless) — health check em `/health`
 - Banco: PostgreSQL gerenciado pelo [Neon](https://neon.tech)
 
-> O backend roda como função serverless na Vercel (`backend/api/index.ts` + `backend/vercel.json`), no mesmo padrão do NestJS empacotado com `@vercel/node`, em vez de Render/Railway. O CORS do backend libera mais de uma origem (`CORS_ORIGIN` aceita lista separada por vírgula) porque a integração do GitHub com a Vercel criou automaticamente um segundo projeto de frontend (`agro-manage`) além do que eu havia criado manualmente (`frontend`) — os dois apontam pro mesmo repositório e ficam publicados; use o link `agro-manage-nine.vercel.app` acima como oficial.
+> O backend roda como função serverless na Vercel (`backend/api/index.ts` + `backend/vercel.json`), no mesmo padrão do NestJS empacotado com `@vercel/node`, em vez de Render/Railway. O frontend oficial é o projeto Vercel `agro-manage` e o backend é o projeto `backend`; ambos fazem deploy automático a cada push na `main`. O `CORS_ORIGIN` do backend aceita uma lista de origens separadas por vírgula. Um terceiro projeto (`frontend`), criado em duplicidade, foi desconectado do GitHub e não recebe mais deploys.
 
 ## Vídeo de apresentação
 
