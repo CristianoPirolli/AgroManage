@@ -223,7 +223,3 @@ Os próximos passos estão registrados como [Issues](../../issues) neste reposit
 - Banco: PostgreSQL gerenciado pelo [Neon](https://neon.tech)
 
 > O backend roda como função serverless na Vercel (`backend/api/index.ts` + `backend/vercel.json`), no mesmo padrão do NestJS empacotado com `@vercel/node`, em vez de Render/Railway. O frontend oficial é o projeto Vercel `agro-manage` e o backend é o projeto `backend`; ambos fazem deploy automático a cada push na `main`. O `CORS_ORIGIN` do backend aceita uma lista de origens separadas por vírgula. Um terceiro projeto (`frontend`), criado em duplicidade, foi desconectado do GitHub e não recebe mais deploys.
-
-## Vídeo de apresentação
-
-_Pendente._
